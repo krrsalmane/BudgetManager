@@ -1,4 +1,4 @@
 package com.budgetmanager.backend.service;
 
-public class budget {
+public class transactionService {
 }

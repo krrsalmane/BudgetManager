@@ -1,4 +1,4 @@
 package com.budgetmanager.backend.DTO;
 
-public class transaction {
+public class budgetDto {
 }

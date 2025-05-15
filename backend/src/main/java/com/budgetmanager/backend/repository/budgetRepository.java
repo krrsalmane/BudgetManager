@@ -1,5 +1,5 @@
 package com.budgetmanager.backend.repository;
 
-public interface budget {
+public interface budgetRepository {
 
 }

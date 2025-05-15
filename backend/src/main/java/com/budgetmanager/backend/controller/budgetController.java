@@ -1,4 +1,4 @@
 package com.budgetmanager.backend.controller;
 
-public class budget {
+public class budgetController {
 }
