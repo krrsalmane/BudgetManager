@@ -27,5 +27,11 @@ public class budgetController {
         return new ResponseEntity<>(createdBudget, HttpStatus.CREATED);
     }
 
-
+    // Get budget by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<budget> getBudgetById(@PathVariable Long id) {
+        Optional<budget> budget = budgetService.getBudgetById(id);
+        return budget.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
 }
