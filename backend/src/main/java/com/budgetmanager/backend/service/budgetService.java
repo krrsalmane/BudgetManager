@@ -43,5 +43,13 @@ public List<budget> getAllBudgets() {
         }
     }
 
+    // Delete a budget
+    public boolean deleteBudget(Long id) {
+        if (budgetRepository.existsById(id)) {
+            budgetRepository.deleteById(id);
+            return true; // Success
+        }
+        return false; // Budget not found
+    }
 
 }
