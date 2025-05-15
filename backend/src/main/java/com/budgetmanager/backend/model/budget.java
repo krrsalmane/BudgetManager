@@ -1,25 +1,25 @@
 package com.budgetmanager.backend.model;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-
-
-public class budget {
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Budget {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     private long id;
     private double budgetAmount;
     private double balance;
     private double expenses;
-
-    public budget(long id, double budgetAmount, double balance, double expenses) {
-        this.id = id;
-        this.budgetAmount = budgetAmount;
-        this.balance = balance;
-        this.expenses = expenses;
-    }
-
-    public budget() {}
 
     public long getId() {
         return id;
