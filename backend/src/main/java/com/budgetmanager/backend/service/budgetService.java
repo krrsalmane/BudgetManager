@@ -23,5 +23,8 @@ public class budgetService {
         return budgetRepository.save(newBudget);
     }
 
-
+    // Get budget by ID
+    public Optional<budget> getBudgetById(Long id) {
+        return budgetRepository.findById(id);
+    }
 }
