@@ -1,75 +1,127 @@
-<div class="container mx-auto p-6 bg-gray-100 min-h-screen">
-  <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Budget Manager</h2>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3>Budget Management</h3>
+                </div>
+                <div class="card-body">
+                    <form (ngSubmit)="saveBudget()" #budgetForm="ngForm">
+                        <div class="alert alert-danger" *ngIf="errorMessage">
+                            {{ errorMessage }}
+                            <button type="button" class="btn-close float-end" (click)="errorMessage = null"></button>
+                        </div>
 
-  <!-- Error Message -->
-  <div *ngIf="errorMessage" class="bg-red-100 text-red-700 p-4 rounded mb-6 text-center">
-    {{ errorMessage }}
-  </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="budgetName" class="form-label">Budget Name</label>
+                                <input
+                                        type="text"
+                                        class="form-control"
+                                        id="budgetName"
+                                        name="budgetName"
+                                        [(ngModel)]="newBudget.budgetName"
+                                        required>
+                            </div>
 
-  <!-- Form to Add/Edit Budget -->
-  <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-    <div class="flex flex-col md:flex-row gap-4">
-      <input
-        [(ngModel)]="newBudget.budgetName"
-        placeholder="Budget Name"
-        class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <input
-        [(ngModel)]="newBudget.budgetAmount"
-        type="number"
-        placeholder="Budget Amount"
-        class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <button
-        (click)="addBudget()"
-        class="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
-      >
-        {{ isEditing ? 'Update Budget' : 'Add Budget' }}
-      </button>
-      <button
-        (click)="resetForm()"
-        class="bg-gray-300 text-gray-800 p-3 rounded-lg hover:bg-gray-400 transition"
-      >
-        Clear
-      </button>
+                            <div class="col-md-6">
+                                <label for="budgetAmount" class="form-label">Budget Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input
+                                            type="number"
+                                            class="form-control"
+                                            id="budgetAmount"
+                                            name="budgetAmount"
+                                            [(ngModel)]="newBudget.budgetAmount"
+                                            min="1"
+                                            required>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="bi bi-save"></i> {{ isEditing ? 'Update' : 'Add' }} Budget
+                                </button>
+                                <button *ngIf="isEditing" type="button" class="btn btn-secondary" (click)="resetForm()">
+                                    <i class="bi bi-x-circle"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Budget List -->
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <table class="w-full text-left">
-      <thead class="bg-gray-200">
-      <tr>
-        <th class="p-4">Name</th>
-        <th class="p-4">Amount</th>
-        <th class="p-4">Balance</th>
-        <th class="p-4">Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let budget of budgets" class="border-b hover:bg-gray-50">
-        <td class="p-4">{{ budget.budgetName }}</td>
-        <td class="p-4">{{ budget.budgetAmount | number:'1.2-2' }}</td>
-        <td class="p-4">{{ budget.balance | number:'1.2-2' }}</td>
-        <td class="p-4">
-          <button
-            (click)="editBudget(budget)"
-            class="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600 transition"
-          >
-            Edit
-          </button>
-          <button
-            (click)="deleteBudget(budget.id)"
-            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-      <tr *ngIf="!budgets.length">
-        <td colspan="4" class="p-4 text-center text-gray-500">No budgets available.</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4>My Budgets</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Budget Name</th>
+                                <th>Budget Amount</th>
+                                <th>Expenses</th>
+                                <th>Balance</th>
+                                <th>Used (%)</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngIf="budgets.length === 0">
+                                <td colspan="6" class="text-center py-4">No budgets found. Add your first budget above.</td>
+                            </tr>
+                            <tr *ngFor="let budget of budgets">
+                                <td>{{ budget.budgetName }}</td>
+                                <td>{{ budget.budgetAmount | currency }}</td>
+                                <td>{{ budget.expenses | currency }}</td>
+                                <td [ngClass]="{'text-success': budget.balance > 0, 'text-danger': budget.balance < 0}">
+                                    {{ budget.balance | currency }}
+                                </td>
+                                <td>
+                                    <div class="progress">
+                                        <div
+                                                class="progress-bar"
+                                                role="progressbar"
+                                                [ngClass]="{
+                          'bg-success': (budget.expenses / budget.budgetAmount) < 0.7,
+                          'bg-warning': (budget.expenses / budget.budgetAmount) >= 0.7 && (budget.expenses / budget.budgetAmount) < 1,
+                          'bg-danger': (budget.expenses / budget.budgetAmount) >= 1
+                        }"
+                                                [style.width.%]="(budget.expenses / budget.budgetAmount) * 100 > 100 ? 100 : (budget.expenses / budget.budgetAmount) * 100">
+                                            {{ (budget.expenses / budget.budgetAmount) * 100 | number:'1.0-0' }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1" (click)="editBudget(budget)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" (click)="deleteBudget(budget.id)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot *ngIf="budgets.length > 0">
+                            <tr class="fw-bold">
+                                <td>Total</td>
+                                <td>{{ budgets | totalAmount:'budgetAmount' | currency }}</td>
+                                <td>{{ budgets | totalAmount:'expenses' | currency }}</td>
+                                <td>{{ budgets | totalAmount:'balance' | currency }}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
