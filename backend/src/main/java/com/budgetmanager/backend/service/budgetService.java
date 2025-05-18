@@ -18,10 +18,10 @@ public class budgetService {
         this.budgetRepository = budgetRepository;
     }
 
-    // Create a new budget (unchanged, as you confirmed it works)
+
     public budget createBudget(budget budget) {
-        budget.setBalance(budget.getBudgetAmount()); // Set initial balance
-        budget.setExpenses(0.0); // Set initial expenses
+        budget.setBalance(budget.getBudgetAmount());
+        budget.setExpenses(0.0);
         return budgetRepository.save(budget);
     }
 
@@ -29,17 +29,18 @@ public class budgetService {
     public Optional<budget> getBudgetById(Long id) {
         return budgetRepository.findById(id);
     }
-public List<budget> getAllBudgets() {
+     public List<budget> getAllBudgets() {
         return budgetRepository.findAll();
 }
     // Update a budget
     public budget updateBudget(Long id, budget budget) {
         Optional<budget> existingBudget = budgetRepository.findById(id);
         if (existingBudget.isPresent()) {
-            budget.setId(id); // Ensure the right ID
+            budget.setId(id);
             return budgetRepository.save(budget);
         } else {
-            return null; // Return null if budget doesn't exist
+            return null;
+
         }
     }
 
@@ -47,9 +48,10 @@ public List<budget> getAllBudgets() {
     public boolean deleteBudget(Long id) {
         if (budgetRepository.existsById(id)) {
             budgetRepository.deleteById(id);
-            return true; // Success
+            return true;
         }
-        return false; // Budget not found
+        return false;
+
     }
 
 }

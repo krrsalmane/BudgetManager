@@ -1,0 +1,75 @@
+<div class="container mx-auto p-6 bg-gray-100 min-h-screen">
+  <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Budget Manager</h2>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="bg-red-100 text-red-700 p-4 rounded mb-6 text-center">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Form to Add/Edit Budget -->
+  <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+    <div class="flex flex-col md:flex-row gap-4">
+      <input
+        [(ngModel)]="newBudget.budgetName"
+        placeholder="Budget Name"
+        class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <input
+        [(ngModel)]="newBudget.budgetAmount"
+        type="number"
+        placeholder="Budget Amount"
+        class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        (click)="addBudget()"
+        class="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
+      >
+        {{ isEditing ? 'Update Budget' : 'Add Budget' }}
+      </button>
+      <button
+        (click)="resetForm()"
+        class="bg-gray-300 text-gray-800 p-3 rounded-lg hover:bg-gray-400 transition"
+      >
+        Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- Budget List -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <table class="w-full text-left">
+      <thead class="bg-gray-200">
+      <tr>
+        <th class="p-4">Name</th>
+        <th class="p-4">Amount</th>
+        <th class="p-4">Balance</th>
+        <th class="p-4">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let budget of budgets" class="border-b hover:bg-gray-50">
+        <td class="p-4">{{ budget.budgetName }}</td>
+        <td class="p-4">{{ budget.budgetAmount | number:'1.2-2' }}</td>
+        <td class="p-4">{{ budget.balance | number:'1.2-2' }}</td>
+        <td class="p-4">
+          <button
+            (click)="editBudget(budget)"
+            class="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600 transition"
+          >
+            Edit
+          </button>
+          <button
+            (click)="deleteBudget(budget.id)"
+            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+      <tr *ngIf="!budgets.length">
+        <td colspan="4" class="p-4 text-center text-gray-500">No budgets available.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
