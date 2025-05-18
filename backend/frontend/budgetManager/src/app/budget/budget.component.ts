@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 interface Budget {
   id?: number;
@@ -19,10 +20,12 @@ interface Budget {
   styleUrls: ['./budget.component.css']
 })
 export class BudgetComponent implements OnInit {
-  budgets: Budget[] = []; // Ensure this is public and typed
-  newBudget: Budget = { budgetName: '', budgetAmount: 0, balance: 0, expenses: 0 }; // Ensure this is public
-  isEditing: boolean = false; // Ensure this is public
-  errorMessage: string | null = null; // Ensure this is public
+  budgets: Budget[] = [];
+  newBudget: Budget = this.getEmptyBudget();
+  isEditing = false;
+  errorMessage: string | null = null;
+
+  private apiUrl = 'http://localhost:8283/api/budgets';
 
   constructor(private http: HttpClient) {}
 
@@ -31,43 +34,29 @@ export class BudgetComponent implements OnInit {
   }
 
   getBudgets() {
-    this.http.get<Budget[]>('http://localhost:8283/api/budgets').subscribe({
+    this.http.get<Budget[]>(this.apiUrl).subscribe({
       next: (data) => {
         this.budgets = data;
         this.errorMessage = null;
       },
-      error: () => {
-        this.errorMessage = 'Failed to load budgets. Please try again.';
-      }
+      error: () => this.errorMessage = 'Failed to load budgets. Please try again.'
     });
   }
 
-  addBudget() {
-    if (!this.newBudget.budgetName || this.newBudget.budgetAmount <= 0) {
-      this.errorMessage = 'Please enter a valid budget name and amount.';
-      return;
-    }
-    if (this.isEditing) {
-      this.http.put<Budget>(`http://localhost:8283/api/budgets/${this.newBudget.id}`, this.newBudget).subscribe({
-        next: () => {
-          this.getBudgets();
-          this.resetForm();
-        },
-        error: () => {
-          this.errorMessage = 'Failed to update budget. Please try again.';
-        }
-      });
-    } else {
-      this.http.post<Budget>('http://localhost:8283/api/budgets', this.newBudget).subscribe({
-        next: () => {
-          this.getBudgets();
-          this.resetForm();
-        },
-        error: () => {
-          this.errorMessage = 'Failed to add budget. Please try again.';
-        }
-      });
-    }
+  saveBudget() {
+    if (!this.validateBudget()) return;
+
+    const request = this.isEditing
+        ? this.http.put<Budget>(`${this.apiUrl}/${this.newBudget.id}`, this.newBudget)
+        : this.http.post<Budget>(this.apiUrl, this.newBudget);
+
+    request.subscribe({
+      next: () => {
+        this.getBudgets();
+        this.resetForm();
+      },
+      error: () => this.errorMessage = `Failed to ${this.isEditing ? 'update' : 'add'} budget. Please try again.`
+    });
   }
 
   editBudget(budget: Budget) {
@@ -75,22 +64,30 @@ export class BudgetComponent implements OnInit {
     this.isEditing = true;
   }
 
-  deleteBudget(id: number | undefined) {
-    if (id) {
-      this.http.delete(`http://localhost:8283/api/budgets/${id}`).subscribe({
-        next: () => {
-          this.getBudgets();
-        },
-        error: () => {
-          this.errorMessage = 'Failed to delete budget. Please try again.';
-        }
-      });
-    }
+  deleteBudget(id?: number) {
+    if (!id) return;
+
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+      next: () => this.getBudgets(),
+      error: () => this.errorMessage = 'Failed to delete budget. Please try again.'
+    });
   }
 
   resetForm() {
-    this.newBudget = { budgetName: '', budgetAmount: 0, balance: 0, expenses: 0 };
+    this.newBudget = this.getEmptyBudget();
     this.isEditing = false;
     this.errorMessage = null;
+  }
+
+  private validateBudget(): boolean {
+    if (!this.newBudget.budgetName || this.newBudget.budgetAmount <= 0) {
+      this.errorMessage = 'Please enter a valid budget name and amount.';
+      return false;
+    }
+    return true;
+  }
+
+  private getEmptyBudget(): Budget {
+    return { budgetName: '', budgetAmount: 0, balance: 0, expenses: 0 };
   }
 }
